@@ -18,7 +18,7 @@ app.use(express.json())
 const upload = multer({
     storage:multer.diskStorage({
         destination:function(req,file,cb){
-            cb(null,'https://raw.githubusercontent.com/PrajwalLokhande2003/ecomm-dashboard/refs/heads/main/Image')
+            cb(null,'./Image')
         },
         filename : function(req,file,cb){
             cb(null,file.originalname)
