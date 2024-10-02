@@ -38,9 +38,9 @@ app.use(express.json())
 //         filename : function(req,file,cb){
 //             cb(null,file.originalname)
             
-//         }
-//     })
-// })
+        }
+    })
+})
 
 
 // app.post('/u-image',upload.single('image'),(req,_res)=>{
