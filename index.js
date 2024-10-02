@@ -57,7 +57,7 @@ app.post('/add-product',upload.single('image'),async (req,res)=>{
     const refstorage = ref(storage,req.file.originalname)
        uploadBytes(refstorage,req.file.buffer)
 
-       let imgUrl = await getDownloadURL(refstorage,req.file.originalname)
+       let imgUrl =  getDownloadURL(refstorage,req.file.originalname)
 
     let product = await Product.create({
         name:req.body.name,
@@ -89,7 +89,7 @@ app.put('/update-product-image/:id',upload.single('image'),async(req,res)=>{
     const refstorage = ref(storage,req.file.originalname)
        uploadBytes(refstorage,req.file.buffer)
 
-       let imgUrl = await getDownloadURL(refstorage,req.file.originalname)
+       let imgUrl =  getDownloadURL(refstorage,req.file.originalname)
 
     let result = await Product.updateOne({_id:req.params.id},{$set:{
         image:imgUrl
