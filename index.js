@@ -1,3 +1,6 @@
+const {getDownloadURL,ref,getStorage,uploadBytes} = require('firebase/storage')
+const config = require('./db/firebaseconfig')
+const { initializeApp } = require('firebase/app')
 const express = require('express')
 const cors = require('cors')
 const multer = require('multer')
@@ -12,31 +15,64 @@ const jwtKey = process.env.JWT_TOKEN
 const PORT = process.env.PORT || 5000
 
 
+
+
+
+initializeApp(config.firebaseConfig)
+
+
+const upload = multer({storage: multer.memoryStorage()})
+
+const storage = getStorage();
+
+// https://raw.githubusercontent.com/PrajwalLokhande2003/ecomm-dashboard/refs/heads/main/Image
+
 app.use(cors())
 app.use(express.json())
 
-const upload = multer({
-    storage:multer.diskStorage({
-        destination:function(req,file,cb){
-            cb(null,'./Image')
-        },
-        filename : function(req,file,cb){
-            cb(null,file.originalname)
+// const upload = multer({
+//     storage:multer.diskStorage({
+//         destination:function(req,file,cb){
+//             cb(null,'./Image')
+//         },
+//         filename : function(req,file,cb){
+//             cb(null,file.originalname)
             
-        }
-    })
-})
+//         }
+//     })
+// })
 
 
-app.post('/add-product', verifyToken,upload.single('image'),async (req,res)=>{
+// app.post('/u-image',upload.single('image'),(req,_res)=>{
+//     const refstorage = ref(storage,req.file.originalname)
+//        uploadBytes(refstorage,req.file.buffer).then((_snapshot)=>{
+//             console.log('file uploaded');
+//             console.log(req.file.originalname);
+            
+//         })
+//         console.log(req.file);
+        
+// })
+app.post('/add-product',upload.single('image'),async (req,res)=>{
+    const refstorage = ref(storage,req.file.originalname)
+       uploadBytes(refstorage,req.file.buffer)
+
+       let imgUrl = await getDownloadURL(refstorage,req.file.originalname)
+
     let product = await Product.create({
         name:req.body.name,
         price:req.body.price,
         category:req.body.category,
         company:req.body.company,
         userId:req.body.userId,
-        image:req.file.filename
+        image:imgUrl
         })
+
+        
+        // getDownloadURL(refstorage,req.file.originalname).then((url)=>{
+        //     console.log(url)
+        // })
+        
     // let result = await product.save()
     res.send(product)
 })
@@ -48,9 +84,15 @@ app.put('/update-product/:id', verifyToken,async(req,res)=>{
     
 })
 
-app.put('/update-product-image/:id', verifyToken,upload.single('image'),async(req,res)=>{
+app.put('/update-product-image/:id',upload.single('image'),async(req,res)=>{
+
+    const refstorage = ref(storage,req.file.originalname)
+       uploadBytes(refstorage,req.file.buffer)
+
+       let imgUrl = await getDownloadURL(refstorage,req.file.originalname)
+
     let result = await Product.updateOne({_id:req.params.id},{$set:{
-        image:req.file.filename
+        image:imgUrl
     }})
     res.send(result) 
 })
@@ -93,7 +135,7 @@ app.post('/login',async (req,res)=>{
 
 
 
-app.get('/image/', verifyToken, async(req,res)=>{
+app.get('/image/', verifyToken, async(_req,res)=>{
     let result = await Product.findOne({})
     let imagePath = path.join(__dirname,'../Front-End/src/components/Image',result.image)
     res.sendFile(imagePath)
@@ -148,7 +190,7 @@ app.put('/update-user/:id', verifyToken,async(req,res)=>{
 function verifyToken(req,res,next){
     let token = req.headers['authorization']
     if(token){
-        Jwt.verify(token,jwtKey,(err,valid)=>{
+        Jwt.verify(token,jwtKey,(err,_valid)=>{
             if(err){
                 res.status(401).send('please provide valid token')
             }else{
