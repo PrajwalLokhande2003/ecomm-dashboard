@@ -55,7 +55,7 @@ app.use(express.json())
 // })
 app.post('/add-product',upload.single('image'),async (req,res)=>{
     const refstorage = ref(storage,req.file.originalname)
-       uploadBytes(refstorage,req.file.buffer)
+       await uploadBytes(refstorage,req.file.buffer)
 
        
 
@@ -65,7 +65,7 @@ app.post('/add-product',upload.single('image'),async (req,res)=>{
         category:req.body.category,
         company:req.body.company,
         userId:req.body.userId,
-        image:getDownloadURL(refstorage,req.file.originalname)
+        image:await getDownloadURL(refstorage,req.file.originalname)
         })
 
         
