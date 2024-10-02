@@ -92,7 +92,7 @@ app.put('/update-product-image/:id',upload.single('image'),async(req,res)=>{
        // let imgUrl =  getDownloadURL(refstorage,req.file.originalname)
 
     let result = await Product.updateOne({_id:req.params.id},{$set:{
-        image:getDownloadURL(refstorage,req.file.originalname)
+        image: await getDownloadURL(refstorage,req.file.originalname)
     }})
     res.send(result) 
 })
