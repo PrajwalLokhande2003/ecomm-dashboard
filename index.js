@@ -87,7 +87,7 @@ app.put('/update-product/:id', verifyToken,async(req,res)=>{
 app.put('/update-product-image/:id',upload.single('image'),async(req,res)=>{
 
     const refstorage = ref(storage,req.file.originalname)
-       uploadBytes(refstorage,req.file.buffer)
+      await uploadBytes(refstorage,req.file.buffer)
 
        // let imgUrl =  getDownloadURL(refstorage,req.file.originalname)
 
